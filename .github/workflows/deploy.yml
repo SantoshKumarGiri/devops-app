@@ -21,8 +21,10 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd /home/ubuntu
-          git clone https://github.com/SantoshKumarGiri/devops-app.git || true
-          cd devops-app
+          if [ ! -d "devops-app" ]; then
+            git clone https://github.com/SantoshKumarGiri/devops-app.git || true
+          fi 
+          cd devops-app git pull
           docker build -t devops-app .
           docker stop devops-app || true
           docker rm devops-app || true
