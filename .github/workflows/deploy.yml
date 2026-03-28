@@ -1,0 +1,29 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: SSH into EC2 and deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ubuntu
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /home/ubuntu
+          git clone https://github.com/SantoshKumarGiri/devops-app.git || true
+          cd devops-app
+          docker build -t devops-app .
+          docker stop devops-app || true
+          docker rm devops-app || true
+          docker run -d -p 80:3000 devops-app
